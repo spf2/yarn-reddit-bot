@@ -20,4 +20,4 @@ app.use(function interpretInvocation(req, res, next) {
 });
 
 var http = require('http');
-http.createServer(app).listen(3000);
+http.createServer(app).listen(process.env.PORT || 3000);
