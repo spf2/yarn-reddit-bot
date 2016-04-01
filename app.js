@@ -17,6 +17,8 @@ app.use(function interpretInvocation(req, res, next) {
     submission(req, res, next)
     return
   }
+
+  res.end("@reddit")
 });
 
 var http = require('http');
