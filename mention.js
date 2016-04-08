@@ -5,7 +5,7 @@
 
   module.exports = function(req, res, next) {
     var mention = req.body.mention;
-    var subreddit = mention.message.text.replace(/@reddit/, '').trim();
+    var subreddit = mention.message.text.replace(/@reddit/, '').replace(/\W+/g, '').trim();
     var form = {
       'action': 'message',
       'label': 'Reddit r/' + subreddit,
@@ -50,5 +50,4 @@
       res.end(JSON.stringify({'form': form}, 0, 2));
     });
   }
-
 }());
