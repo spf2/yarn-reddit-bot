@@ -37,9 +37,10 @@
         if (form.items[0].select.options.length == 10) {
           continue
         }
+        var mobileUrl = item.link.replace(/www\.reddit\.com/, 'm.reddit.com')
         form.items[0].select.options.push({
           'name': item.title,
-          'value': item.link,
+          'value': mobileUrl,
           'media': { 'url': thumb(item.description, next) },
         });
       }
