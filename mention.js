@@ -5,11 +5,20 @@
 
   module.exports = function(req, res, next) {
     var mention = req.body.mention;
+    if (!mention.message.text.startsWith('@')) {
+      next();
+      return;
+    }
     var subreddit = mention.message.text.replace(/@reddit/, '').replace(/\W+/g, '').trim();
     var form = {
       'action': 'message',
       'label': 'Reddit r/' + subreddit,
-      'items' : [{'select': {'options': []}}],
+      'items' : [{
+        'select': {
+          'label': 'Pick one to share with the thread',
+          'options': [],
+        },
+      }],
     };
     if (mention.thread) {
       form['thread_id'] = mention.thread.thread_id;
@@ -35,20 +44,29 @@
       var item;
       while (item = this.read()) {
         if (form.items[0].select.options.length == 10) {
-          continue
+          continue;
         }
-        var mobileUrl = item.link.replace(/www\.reddit\.com/, 'm.reddit.com')
+        var mobileUrl = item.link.replace(/www\.reddit\.com/, 'm.reddit.com');
+        var mediaUrl = thumb(item.description, next);
+        if (!mediaUrl) {
+          continue;
+        }
         form.items[0].select.options.push({
           'name': item.title,
           'value': mobileUrl,
-          'media': { 'url': thumb(item.description, next) },
+          'media': { 'url':  mediaUrl },
         });
       }
     });
 
     parser.on('end', function() {
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({'form': form}, 0, 2));
+      if (form.items[0].select.options.length == 0) {
+        var msg = {'text': "Not a subreddit. Try @reddit aww (or funny or gifs or ...)"}
+        res.end(JSON.stringify({'message': msg}))
+      } else {
+        res.end(JSON.stringify({'form': form}));
+      }
     });
   }
 }());
